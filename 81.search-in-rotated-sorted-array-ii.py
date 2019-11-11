@@ -18,25 +18,21 @@ class Solution:
             mid = int((left + right) / 2)
             if nums[mid] == target:
                 return True
-            if nums[mid] < target:
-                if target > nums[0]:
-                    if nums[mid] >= nums[0]:
-                        left = mid + 1
-                    else:
-                        right = mid - 1
-                else:
+            if nums[mid] < nums[right]:
+                if target > nums[mid] and target <= nums[right]:
                     left = mid + 1
-            elif nums[mid] > target:
-                if target < nums[0]:
-                    if nums[mid] >= nums[0]:
-                        left = mid + 1
-                    else:
-                        right = mid - 1
                 else:
                     right = mid - 1
+            elif nums[mid] > nums[right]:
+                if target < nums[mid] and target >= nums[left]:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+            else:
+                right -= 1
+
         
-        if nums[mid] == target:
-            return True
+        return False
 
 # @lc code=end
 
@@ -46,4 +42,10 @@ class Solution:
 # 2          2
 #           1
 #       0 0
+
+# note 
+# the idea gradually gets rid of half of the array 
+# but when duplicate numbers exist, in some cases the algorithm cannot delete
+# half of the array due to the same of mid,left,right value, in these cases,
+# the only thing can do is end = end - 1 
 
