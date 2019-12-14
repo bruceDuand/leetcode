@@ -12,6 +12,37 @@ import java.util.Queue;
 // @lc code=start
 class Solution {
     public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        dfs(nums, 0, res);
+        return res;
+    }
+
+    private void dfs(int[] nums, int start, List<List<Integer>> res) {
+        if (start == nums.length - 1) {
+            List<Integer> tmp = new ArrayList<>();
+            for (int num : nums) {
+                tmp.add(num);
+            }
+            res.add(tmp);
+
+            return;
+        }
+
+        for (int i = start; i < nums.length; i++) {
+            swap(nums, i, start);
+            dfs(nums, start + 1, res);
+            swap(nums, i, start);
+        }
+
+    }
+
+    private void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+
+    public List<List<Integer>> permute2(int[] nums) {
         Queue<List<Integer>> queue = new LinkedList<List<Integer>>();
         List<List<Integer>> res = new ArrayList<List<Integer>>();
 
