@@ -26,6 +26,129 @@ To solve problems concerning recursion, the idea of writing the recursive functi
 3. dealing with the recursion results in the last step, if the return type is void, this step can be ignored.
 4. return the result(**in aspect of the inner level**)
 
+---
+
+## 46 Permutations
+
+This problem requires to return all the permutations of a given integer arrays, two solutions can be down.
+
+**Solution 1:**
+
+Use a queue to store the list of all current permutations, then for each new interger, pop a list in the queue, and add the new integer to every possible position in the list, then push back the list to the queue, it is kind of  a bfs method.
+
+ ```java
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+/*
+ * @lc app=leetcode id=46 lang=java
+ *
+ * [46] Permutations
+ */
+
+// @lc code=start
+class Solution {
+    public List<List<Integer>> permute(int[] nums) {
+        Queue<List<Integer>> queue = new LinkedList<List<Integer>>();
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+
+        for (int i = 0; i < nums.length; i++) {
+            int quene_length = queue.size();
+            for (int j = 0; j < quene_length; j++) {
+                List<Integer> list = queue.poll();
+                for (int k = 0; k <= list.size(); k++) {
+                    list.add(k, nums[i]);
+                    queue.add(new ArrayList<Integer>(list));
+                    list.remove(k);
+                }
+            }
+
+            if (quene_length == 0) {
+                List<Integer> list = new ArrayList<>();
+                list.add(nums[i]);
+                queue.add(list);
+            }
+        }
+
+        int length = queue.size();
+        for (int i = 0; i < length; i++) {
+            res.add(new ArrayList(queue.poll()));
+
+        }
+
+        return res;
+    }
+}
+// @lc code=end
+
+ ```
+
+**Solution 2:**
+
+However, the simple recursion adn dfs method is much simpler and more clear. The problem is simple using dfs, the points need to notice are:
+
+1. dfs always need a end case judgment, otherwise  the same list could be added repeatedly during recursion.
+2. Be careful where the for loop starts(from start, or from start+1), That may cause some additional problem.
+
+```java
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+/*
+ * @lc app=leetcode id=46 lang=java
+ *
+ * [46] Permutations
+ */
+
+// @lc code=start
+class Solution {
+    public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        dfs(nums, 0, res);
+        return res;
+    }
+
+    private void dfs(int[] nums, int start, List<List<Integer>> res) {
+        if (start == nums.length - 1) {
+            List<Integer> tmp = new ArrayList<>();
+            for (int num : nums) {
+                tmp.add(num);
+            }
+            res.add(tmp);
+
+            return;
+        }
+
+        for (int i = start; i < nums.length; i++) {
+            swap(nums, i, start);
+            dfs(nums, start + 1, res);
+            swap(nums, i, start);
+        }
+
+    }
+
+    private void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+}
+// @lc code=end
+
+```
+
+
+
+
+
+
+
+---
+
 ## 104. Maximum Depth of Binary Tree
 
 This is a very classical implementation of recursion. In the solution, the function has a return type, which requires a further process of the returned value like step 3.
