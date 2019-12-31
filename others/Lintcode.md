@@ -371,3 +371,313 @@ public class Solution {
 }
 ```
 
+---
+
+## 428 Pow(x, n)
+
+Given the base and the power number, return the result. Simply using a for loop to calculate the result will cause running out of time.
+
+**Solution:**
+
+Using recursion is an acceptable answer, if n is an even number, then return half*half, if n is an odd number, then there is an additional x, and we should return half \* half \* x. The last case is when n is a negative number, then we shuld return the reciprocal, which is half \* half / x in each recursive step.
+
+```java
+public class Solution {
+    /**
+     * @param x: the base number
+     * @param n: the power number
+     * @return: the result
+     */
+    public double myPow(double x, int n) {  
+        if (n==0)
+            return 1;
+        double half = myPow(x, n/2);
+        if (n%2 == 0)
+            return half*half;
+        if(n > 0)
+            return half*half*x;
+        else
+            return half*half/x;     
+    }
+}
+```
+
+---
+
+## 418 Integer to Roman
+
+Given an integer, convert it to roman expression. The number is restricted from 1 to 3999, which makes the problem much easier.
+
+For Roman expression, we got:
+
+```
+I - 1
+V - 5
+X - 10
+L - 50
+C - 100 
+D - 500
+M - 1000
+```
+
+**Solution:**
+
+The special point of Roman expressio is it expresses 5 & 9 differently, so we should discuss them separately from other cases.
+
+We can divide the number by 1, 10, 100, 1000, and consider the reuslt falls in which cases.
+
+```java
+public class Solution {
+    /**
+     * @param n: The integer
+     * @return: Roman representation
+     */
+    public String intToRoman(int n) {
+        // write your code here
+        String res = "";
+        
+        String[] roman = {"M", "D", "C", "L", "X", "V", "I"};
+        int[] value = {1000, 500, 100, 50, 10, 5, 1};
+        
+        for (int i=0; i<7; i=i+2) {
+            int x = n / value[i];
+            if (x < 4) {
+                for (int j=1; j<=x; j++) res += roman[i];
+            }else if (x == 4) {
+                res += roman[i] + roman[i-1];
+            }else if (x > 4 && x < 9) {
+                res += roman[i-1];
+                for(int j=6; j<=x; j++) res += roman[i];
+            }else if (x == 9)
+                res += roman[i] + roman[i-2];
+            
+            n = n % value[i];
+        }
+        
+        return res;
+    }
+}
+```
+
+---
+
+## Problems concerning anagrams
+
+Can be solved using hash ideas, using a array of size 256(the size of all ascii code), and store the appereace of each char in the array.
+
+---
+
+## 639 Word Abbreiation
+
+Given an array of n distinct non-empty strings, you need to generate **minimal** possible abbreviations for every word following rules below.
+
+1. Begin with the first character and then the number of characters abbreviated, which followed by the last character.
+2. If there are any conflict, that is more than one words share the same abbreviation, a longer prefix is used instead of only the first character until making the map from word to abbreviation become unique. In other words, a final abbreviation cannot map to more than one original words.
+3. If the abbreviation doesn't make the word shorter, then keep it as original.
+
+example:
+
+```
+Input:
+["like","god","internal","me","internet","interval","intension","face","intrusion"]
+Output:
+["l2e","god","internal","me","i6t","interval","inte4n","f2e","intr4n"]
+```
+
+**Solution:**
+
+This problem is some kind of interesting, The point is to find if there is two abbreviations that are the same, if there are, then we should update the abbreviations stored in the answer, therefore, we can use a hashmap to store the number of appereaces of each word. After the first iteration, we need a for loop and a round variable to store the depth that we have gone through.
+
+```java
+public class Solution {
+    /**
+     * @param dict: an array of n distinct non-empty strings
+     * @return: an array of minimal possible abbreviations for every word
+     */
+    public String[] wordsAbbreviation(String[] dict) {
+        // write your code here
+        
+        String[] res = new String[dict.length];
+        HashMap<String, String> strmap = new HashMap<String, String>(); 
+        HashMap<String, Integer> count = new HashMap<String, Integer>();
+        int round = 1;
+        
+        for (int i=0; i<dict.length; i++) {
+            String word = dict[i];
+            String abbr = getAbbrev(word, 0, word.length()-1);
+            strmap.put(word, abbr);
+            if (count.containsKey(abbr))
+                count.put(abbr, count.get(abbr)+1);
+            else
+                count.put(abbr, 1);
+            res[i] = abbr;
+        }
+        
+        while (true) {
+            boolean valid = true;
+            for (int i=0; i<dict.length; i++) {
+                if (count.get(strmap.get(dict[i])) > 1) {
+                    valid = false;
+                    String word = dict[i];
+                    String abbr = getAbbrev(word, round, word.length()-1);
+                    strmap.put(word, abbr);
+                    if (count.containsKey(abbr))
+                        count.put(abbr, count.get(abbr)+1);
+                    else
+                        count.put(abbr, 1);
+                    res[i] = abbr;
+                    
+                }
+            }
+            
+            if (!valid) {
+                round++;
+            }
+            else
+                break;
+        }
+        return res;
+        
+    }
+    
+    private String getAbbrev(String word, int p, int q) {
+        if (p >= word.length() || q >= word.length())
+            return "";
+        if (q-p <= 2)
+            return word;
+        else
+            return word.substring(0, p+1)+String.valueOf(q-p-1)+word.substring(q, word.length());
+    }
+}
+```
+
+---
+
+## 663 Walls and Gates
+
+You are given a m x n 2D grid initialized with these three possible values.
+
+```
+-1 - A wall or an obstacle.
+0 - A gate.
+INF - Infinity means an empty room. We use the value 2^31 - 1 = 2147483647 to represent INF as you may assume that the distance to a gate is less than 2147483647.
+Fill each empty room with the distance to its nearest gate. If it is impossible to reach a Gate, that room should remain filled with INF
+```
+
+In a short, update the points in the graph with the shortest jumps that it could reach a gate.
+
+**Solution:**
+
+This is a very standard BFS problem concerning graph, or 2D matrix, could be solved by Iterating on points deeper and deeper, while comparing if the number of jumps is minimum.
+
+The thing needs to notice is the dirrection the point goes when we define the dx and dy array.
+
+```java
+public class Solution {
+    /**
+     * @param rooms: m x n 2D grid
+     * @return: nothing
+     */
+    public void wallsAndGates(int[][] rooms) {
+        // write your code here
+        
+        Queue<Integer> q = new LinkedList<Integer>();
+        
+        int[] dx = {1, 0, -1, 0};
+        int[] dy = {0, 1, 0, -1};
+        
+        for (int i=0; i<rooms.length; i++)
+            for (int j=0; j<rooms[0].length; j++)
+                if (rooms[i][j] == 0)
+                    q.add(i*rooms[0].length+j);
+                    
+        while (!q.isEmpty()) {
+            int qlen = q.size();
+            for (int i=0; i<qlen; i++) {
+                int pos = q.remove();
+                int nx = pos / rooms[0].length;
+                int ny = pos % rooms[0].length;
+                
+                for (int d=0; d<4; d++) {
+                    int cx = nx + dx[d];
+                    int cy = ny + dy[d];
+                    if (cx == -1 || cx == rooms.length || cy == -1 || cy == rooms[0].length || rooms[cx][cy] == -1){
+                        continue;
+                    }
+                    
+                    if (rooms[cx][cy] > rooms[nx][ny]+1) {
+                        rooms[cx][cy] = rooms[nx][ny]+1;
+                        q.add(cx*rooms[0].length+cy);
+                    }
+                }
+                
+            }
+        }
+        
+    }
+}
+```
+
+---
+
+## 598 Zombie in Matrix
+
+Determine how many steps could change all people in the graph to zombie(a people could be changed to a zombie in one step if it is near a zombie) 
+
+There are some changes(can be seen as a followup of the last problem), since normally, the queue can not be empty, so we need an additional variable people to determine the end of the while loop. In case the queue becomes empty, then the loop should also end, because this means that the rest people can not be changed into zombie due to some walls or obstycles are between people and zombie
+
+```java
+public class Solution {
+    /**
+     * @param grid: a 2D integer grid
+     * @return: an integer
+     */
+    public int zombie(int[][] grid) {
+        // write your code here
+        int people = 0;
+        int round = 0;
+        Queue<Integer> q = new LinkedList<Integer>();
+        int m = grid.length;
+        int n = grid[0].length;
+       
+        int[] dx = {1, 0, -1, 0};
+        int[] dy = {0, -1, 0, 1};
+        
+        for (int i=0; i<m; i++)
+            for (int j=0; j<n; j++) {
+                if (grid[i][j] == 1)
+                    q.add(i*n+j);
+                else if(grid[i][j] == 0)
+                    people++;
+            }
+            
+        while(people > 0 && !q.isEmpty()) {
+            int qlen = q.size();
+            for (int i=0; i<qlen; i++) {
+                int pos = q.remove();
+                int nx = pos / n;
+                int ny = pos % n;
+                
+                for(int d = 0; d<4; d++) {
+                    int cx = nx + dx[d];
+                    int cy = ny + dy[d];
+                    if (cx == -1 || cx == m || cy == -1 || cy == n)
+                        continue;
+                    if (grid[cx][cy] == 0) {
+                        grid[cx][cy] = 1;
+                        q.add(cx*n+cy);
+                        people--;
+                    }
+                }
+            }
+            round++;
+        }
+        
+        if (q.isEmpty())
+            return -1;
+        return round;
+        
+    }
+}
+```
+

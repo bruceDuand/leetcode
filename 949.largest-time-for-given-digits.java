@@ -13,34 +13,23 @@ import java.util.Queue;
 // @lc code=start
 class Solution {
     public String largestTimeFromDigits(int[] A) {
+        int res = -1;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < 4; k++) {
+                    if (i == j || j == k || k == i)
+                        continue;
+                    int m = 6 - i - j - k;
+                    int hours = A[i] * 10 + A[j];
+                    int minitues = A[k] * 10 + A[m];
+                    if (hours < 24 && minitues < 60)
+                        res = Math.max(res, hours * 60 + minitues);
 
-        // int timemax = 0;
-        // String res = "";
-        // Queue<List<Integer>> cases = new LinkedList<List<Integer>>();
-        // cases.add(new List(A[0]));
-        // for (int i = 1; i < 4; i++) {
-        // int qlen = cases.size();
-        // for (int j = 0; j <= qlen; j++) {
-        // List<Integer> temp = cases.remove();
-        // for (int k = 0; k <= temp.size(); k++) {
-        // temp.add(k, A[i]);
-        // cases.add(temp);
-        // }
-        // }
-        // }
+                }
+            }
+        }
 
-        // int max = 23 * 60 + 59;
-        // int qlen = cases.size();
-        // for (int i = 0; i < qlen; i++) {
-        // List<Integer> temp = cases.remove();
-        // int time = (temp.get(0) * 10 + temp.get(1)) * 60 + (temp.get(2) * 10 +
-        // temp.get(3));
-        // if (time >= 0 && time <= max && time > timemax) {
-        // timemax = time;
-        // res = String.valueOf(temp.get(0) * 10 + temp.get(1)) + ":"
-        // + String.valueOf(temp.get(2) * 10 + temp.get(3));
-        // }
-        // }s
+        return res >= 0 ? String.format("%02d:%02d", res / 60, res % 60) : "";
     }
 }
 // @lc code=end
